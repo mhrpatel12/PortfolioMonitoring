@@ -1,4 +1,4 @@
-package com.mihir.portfoliomonitoring.activities.activities;
+package com.mihir.portfoliomonitoring.activities;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;

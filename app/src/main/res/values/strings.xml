@@ -17,4 +17,23 @@
     <string name="actionAboutUs">About Us</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_maps">Map</string>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="neera">NIRA is a new fintech business seeking to address the issue of access to credit for consumers
+in India. With banks relying predominantly on CIBIL scores and collateral pledged against
+loans, less than 10% of Indians are able to get loans through the formal sector. Thus, most
+people are forced to use informal channels when they need finance.
+        \n \n
+In todays digital age, users are creating large amounts of information about themselves
+through their activity on their smartphones and online. By combining these news types of
+data with traditional sources used to assess borrowers (bank statement etc.) we can now
+score these previously unscored borrowers. If a borrowers score is sufficiently high on our
+proprietary model, we can offer them credit.
+        \n \n
+We are reimagining the way loans are underwritten and bring access to credit to millions of
+underbanked in India. We can economically empower them to have greater control of their
+lives and provide downside protection in difficult times. We are addressing head-on a big
+challenge. Its also a great opportunity from both a commercial and societal impact
+perspective.</string>
 </resources>
