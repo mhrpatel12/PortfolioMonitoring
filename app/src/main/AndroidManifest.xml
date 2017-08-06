@@ -23,6 +23,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <meta-data android:name="sendotp.key" android:value="@string/otp_key" />
+
         <activity
             android:name=".activities.LoginActivity"
             android:label="@string/app_name">

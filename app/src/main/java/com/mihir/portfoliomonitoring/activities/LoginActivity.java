@@ -1,6 +1,7 @@
 package com.mihir.portfoliomonitoring.activities;
 
 import android.annotation.TargetApi;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -36,8 +37,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.mihir.portfoliomonitoring.R;
 import com.mihir.portfoliomonitoring.models.User;
-
-import java.util.concurrent.TimeUnit;
+import com.msg91.sendotp.library.SendOtpVerification;
+import com.msg91.sendotp.library.Verification;
+import com.msg91.sendotp.library.VerificationListener;
 
 import static android.Manifest.permission.READ_CONTACTS;
 import static android.Manifest.permission.READ_SMS;
@@ -45,7 +47,7 @@ import static android.Manifest.permission.READ_SMS;
 /**
  * A login screen that offers login via Email/Mobile Number with OTP/regular password
  */
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity implements VerificationListener {
 
     private static final int REQUEST_READ_SMS = 0;
 
@@ -81,10 +83,20 @@ public class LoginActivity extends AppCompatActivity {
     private PhoneAuthProvider.ForceResendingToken mResendToken;
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
 
+    private Verification mVerification;
+
+    private ProgressDialog progressDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        if (getIntent().getBooleanExtra("EXIT", false)) {
+            finish();
+        }
+
+        progressDialog = new ProgressDialog(this);
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
@@ -155,6 +167,10 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     });
                 } else {
+                    if (!progressDialog.isShowing()) {
+                        progressDialog.setMessage(getString(R.string.title_signing_in_user));
+                        progressDialog.show();
+                    }
                     attemptLoginByEmailPassword(edtEmailLogin.getText().toString().trim(), edtPasswordLogin.getText().toString().trim());
                 }
             }
@@ -164,6 +180,10 @@ public class LoginActivity extends AppCompatActivity {
         mEmailRegistrationInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (!progressDialog.isShowing()) {
+                    progressDialog.setMessage(getString(R.string.title_registering_user));
+                    progressDialog.show();
+                }
                 attemptRegistrationByEmailPassword(edtEmailRegistration.getText().toString().trim(), edtPasswordRegistration.getText().toString().trim());
             }
         });
@@ -291,12 +311,21 @@ public class LoginActivity extends AppCompatActivity {
         String password = edtPasswordLogin.getText().toString().trim();
 
         //showProgress(true);
-        PhoneAuthProvider.getInstance().verifyPhoneNumber(
+/*        PhoneAuthProvider.getInstance().verifyPhoneNumber(
                 "+91" + mobileNumber,        // Phone number to verify
                 60,                 // Timeout duration
                 TimeUnit.SECONDS,   // Unit of timeout
                 LoginActivity.this,               // Activity (for callback binding)
-                mCallbacks);        // OnVerificationStateChangedCallbacks
+                mCallbacks);        // OnVerificationStateChangedCallbacks*/
+
+        mVerification = SendOtpVerification.createSmsVerification
+                (SendOtpVerification
+                        .config("+91" + mobileNumber)
+                        .context(this)
+                        .autoVerification(true)
+                        .build(), this);
+
+        mVerification.initiate();
 
     }
 
@@ -307,17 +336,23 @@ public class LoginActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
+                            if (progressDialog.isShowing()) {
+                                progressDialog.dismiss();
+                            }
                             Log.d(TAG, "signInWithEmail:success");
                             Toast.makeText(LoginActivity.this, "Authentication success.",
-                                    Toast.LENGTH_SHORT).show();
+                                    Toast.LENGTH_LONG).show();
                             FirebaseUser user = mAuth.getCurrentUser();
 
                             startEmployerSelectionActivity();
                         } else {
                             // If sign in fails, display a message to the user.
+                            if (progressDialog.isShowing()) {
+                                progressDialog.dismiss();
+                            }
                             Log.w(TAG, "signInWithEmail:failure", task.getException());
                             Toast.makeText(LoginActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
+                                    Toast.LENGTH_LONG).show();
                         }
                     }
                 });
@@ -330,18 +365,25 @@ public class LoginActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
+                            if (progressDialog.isShowing()) {
+                                progressDialog.dismiss();
+                            }
                             Log.d(TAG, "createUserWithEmail:success");
                             FirebaseUser user = mAuth.getCurrentUser();
                             writeNewUser(user.getUid(), user.getDisplayName() + "",
                                     user.getEmail(), edtMobileRegistration.getText().toString().trim(),
                                     "", "", 50); //DUMMY COMPANY DATA.
                             Toast.makeText(LoginActivity.this, "Registration success.",
-                                    Toast.LENGTH_SHORT).show();
+                                    Toast.LENGTH_LONG).show();
+                            startEmployerSelectionActivity();
                         } else {
                             // If sign in fails, display a message to the user.
+                            if (progressDialog.isShowing()) {
+                                progressDialog.dismiss();
+                            }
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(LoginActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActivity.this, task.getException() + "",
+                                    Toast.LENGTH_LONG).show();
                         }
                     }
                 });
@@ -355,6 +397,30 @@ public class LoginActivity extends AppCompatActivity {
     private void startEmployerSelectionActivity() {
         Intent intent = new Intent(LoginActivity.this, EmployerSelectionActivity.class);
         startActivity(intent);
+    }
+
+    @Override
+    public void onInitiated(String response) {
+        Log.d(TAG, "Initialized!" + response);
+        //OTP successfully resent/sent.
+    }
+
+    @Override
+    public void onInitiationFailed(Exception exception) {
+        Log.e(TAG, "Verification initialization failed: " + exception.getMessage());
+        //sending otp failed.
+    }
+
+    @Override
+    public void onVerified(String response) {
+        Log.d(TAG, "Verified!\n" + response);
+        //OTP verified successfully.
+    }
+
+    @Override
+    public void onVerificationFailed(Exception exception) {
+        Log.e(TAG, "Verification failed: " + exception.getMessage());
+        //OTP  verification failed.
     }
 }
 
