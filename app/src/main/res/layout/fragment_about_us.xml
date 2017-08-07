@@ -17,11 +17,15 @@
         android:layout_margin="20dp"
         android:background="@color/transpenrent_black" />
 
-    <TextView
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_margin="30dp"
-        android:text="@string/neera"
-        android:textColor="@android:color/white" />
+        android:layout_height="wrap_content">
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="30dp"
+            android:text="@string/aboutUs"
+            android:textColor="@android:color/white" />
+    </ScrollView>
 </FrameLayout>
