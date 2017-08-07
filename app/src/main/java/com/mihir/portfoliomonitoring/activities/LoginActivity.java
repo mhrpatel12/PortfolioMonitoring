@@ -36,10 +36,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.mihir.portfoliomonitoring.R;
+import com.mihir.portfoliomonitoring.models.ReferralCodeMaster;
 import com.mihir.portfoliomonitoring.models.User;
-import com.msg91.sendotp.library.SendOtpVerification;
-import com.msg91.sendotp.library.Verification;
-import com.msg91.sendotp.library.VerificationListener;
+
+import java.util.concurrent.TimeUnit;
 
 import static android.Manifest.permission.READ_CONTACTS;
 import static android.Manifest.permission.READ_SMS;
@@ -47,7 +47,7 @@ import static android.Manifest.permission.READ_SMS;
 /**
  * A login screen that offers login via Email/Mobile Number with OTP/regular password
  */
-public class LoginActivity extends AppCompatActivity implements VerificationListener {
+public class LoginActivity extends AppCompatActivity {
 
     private static final int REQUEST_READ_SMS = 0;
 
@@ -64,9 +64,9 @@ public class LoginActivity extends AppCompatActivity implements VerificationList
     private AppCompatCheckBox chkSignInWithOTP;
 
     private EditText edtEmailRegistration;
-    private EditText edtMobileRegistration;
     private EditText edtPasswordRegistration;
     private EditText edtConfirmPasswordRegistration;
+    private EditText edtReferralCOde;
 
     private static final String KEY_VERIFY_IN_PROGRESS = "key_verify_in_progress";
 
@@ -83,9 +83,9 @@ public class LoginActivity extends AppCompatActivity implements VerificationList
     private PhoneAuthProvider.ForceResendingToken mResendToken;
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
 
-    private Verification mVerification;
-
     private ProgressDialog progressDialog;
+
+    private String referralCodeKey = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,9 +112,9 @@ public class LoginActivity extends AppCompatActivity implements VerificationList
         edtPasswordLogin = (EditText) findViewById(R.id.edtPasswordLogin);
 
         edtEmailRegistration = (EditText) findViewById(R.id.edtEmailRegistration);
-        edtMobileRegistration = (EditText) findViewById(R.id.edtMobileRegistration);
         edtPasswordRegistration = (EditText) findViewById(R.id.edtPasswordRegistration);
         edtConfirmPasswordRegistration = (EditText) findViewById(R.id.edtConfirmPasswordRegistration);
+        edtReferralCOde = (EditText) findViewById(R.id.edtReferalCodeRegistration);
 
         chkSignInWithOTP = (AppCompatCheckBox) findViewById(R.id.chkSignInWithOTP);
         chkSignInWithOTP.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -153,25 +153,23 @@ public class LoginActivity extends AppCompatActivity implements VerificationList
             @Override
             public void onClick(View view) {
                 if (chkSignInWithOTP.isChecked()) {
-                    mDatabase.child(getString(R.string.users)).orderByChild(getString(R.string.mobile_number)).equalTo(edtMobileLogin.getText().toString().trim()).addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            if (dataSnapshot.exists()) {
-                                attemptLoginByOTP(edtMobileLogin.getText().toString().trim());
-                            }
+                    if (isMobileNumberValid()) {
+                        if (!progressDialog.isShowing()) {
+                            progressDialog.setMessage(getString(R.string.title_signing_in_user));
+                            progressDialog.show();
                         }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-                            Toast.makeText(LoginActivity.this, "Yikes !!", Toast.LENGTH_LONG).show();
-                        }
-                    });
-                } else {
-                    if (!progressDialog.isShowing()) {
-                        progressDialog.setMessage(getString(R.string.title_signing_in_user));
-                        progressDialog.show();
+                        attemptLoginByOTP(edtMobileLogin.getText().toString().trim());
+                    } else {
+                        Toast.makeText(LoginActivity.this, getString(R.string.error_invalid_mobile), Toast.LENGTH_LONG).show();
                     }
-                    attemptLoginByEmailPassword(edtEmailLogin.getText().toString().trim(), edtPasswordLogin.getText().toString().trim());
+                } else {
+                    if (isLoginFormComplete()) {
+                        if (!progressDialog.isShowing()) {
+                            progressDialog.setMessage(getString(R.string.title_signing_in_user));
+                            progressDialog.show();
+                        }
+                        attemptLoginByEmailPassword(edtEmailLogin.getText().toString().trim(), edtPasswordLogin.getText().toString().trim());
+                    }
                 }
             }
         });
@@ -180,11 +178,23 @@ public class LoginActivity extends AppCompatActivity implements VerificationList
         mEmailRegistrationInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!progressDialog.isShowing()) {
-                    progressDialog.setMessage(getString(R.string.title_registering_user));
-                    progressDialog.show();
+                if (isRegistrationFormComplete()) {
+                    if (verifyPassword()) {
+                        if (!progressDialog.isShowing()) {
+                            progressDialog.setMessage(getString(R.string.title_registering_user));
+                            progressDialog.show();
+                        }
+                        if ((edtReferralCOde.getText().toString().trim()).equals("")) {
+                            attemptRegistrationByEmailPassword(edtEmailRegistration.getText().toString().trim(), edtPasswordRegistration.getText().toString().trim());
+                        } else {
+                            verifyReferralCode(edtReferralCOde.getText().toString().trim());
+                        }
+                    } else {
+                        Toast.makeText(LoginActivity.this, getString(R.string.error_passwords_not_matching), Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(LoginActivity.this, getString(R.string.error_registration), Toast.LENGTH_LONG).show();
                 }
-                attemptRegistrationByEmailPassword(edtEmailRegistration.getText().toString().trim(), edtPasswordRegistration.getText().toString().trim());
             }
         });
 
@@ -228,6 +238,51 @@ public class LoginActivity extends AppCompatActivity implements VerificationList
             }
         };
         // [END phone_auth_callbacks]
+    }
+
+    private boolean isRegistrationFormComplete() {
+        return (!(edtEmailRegistration.getText().toString().trim()).equals(""))
+                && (!((edtPasswordRegistration.getText().toString().trim()).equals("")))
+                && (!(edtConfirmPasswordRegistration.getText().toString().trim()).equals(""));
+    }
+
+    private boolean isLoginFormComplete() {
+        return (!(edtEmailLogin.getText().toString().trim()).equals(""))
+                && (!((edtPasswordLogin.getText().toString().trim()).equals("")));
+    }
+
+    private boolean isMobileNumberValid() {
+        return (edtMobileLogin.getText().toString().trim()).length() == 10;
+    }
+
+    private boolean verifyPassword() {
+        return ((edtPasswordRegistration.getText().toString().trim()).equals((edtConfirmPasswordRegistration.getText().toString().trim())));
+    }
+
+    private void verifyReferralCode(final String referralCode) {
+        mDatabase.child(getString(R.string.referral_code_master)).orderByChild(getString(R.string.referral_code)).equalTo(referralCode).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                    ReferralCodeMaster referralCodeMaster = ds.getValue(ReferralCodeMaster.class);
+                    if (referralCodeMaster.getIsActive() == 1) {
+                        referralCodeKey = ds.getKey();
+                        attemptRegistrationByEmailPassword(edtEmailRegistration.getText().toString().trim(), edtPasswordRegistration.getText().toString().trim());
+                    } else {
+                        if (progressDialog.isShowing()) {
+                            progressDialog.dismiss();
+                        }
+                        Toast.makeText(LoginActivity.this, getString(R.string.error_referral_code_expired),
+                                Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     // [START sign_in_with_phone]
@@ -296,36 +351,13 @@ public class LoginActivity extends AppCompatActivity implements VerificationList
         }
     }
 
-    /**
-     * Attempts to sign in or register the account specified by the login form.
-     * If there are form errors (invalid email, missing fields, etc.), the
-     * errors are presented and no actual login attempt is made.
-     */
     private void attemptLoginByOTP(String mobileNumber) {
-        // Reset errors.
-        edtEmailLogin.setError(null);
-        edtPasswordLogin.setError(null);
-
-        // Store values at the time of the login attempt.
-        String email = edtEmailLogin.getText().toString().trim();
-        String password = edtPasswordLogin.getText().toString().trim();
-
-        //showProgress(true);
-/*        PhoneAuthProvider.getInstance().verifyPhoneNumber(
+        PhoneAuthProvider.getInstance().verifyPhoneNumber(
                 "+91" + mobileNumber,        // Phone number to verify
                 60,                 // Timeout duration
                 TimeUnit.SECONDS,   // Unit of timeout
                 LoginActivity.this,               // Activity (for callback binding)
-                mCallbacks);        // OnVerificationStateChangedCallbacks*/
-
-        mVerification = SendOtpVerification.createSmsVerification
-                (SendOtpVerification
-                        .config("+91" + mobileNumber)
-                        .context(this)
-                        .autoVerification(true)
-                        .build(), this);
-
-        mVerification.initiate();
+                mCallbacks);        // OnVerificationStateChangedCallbacks
 
     }
 
@@ -369,10 +401,15 @@ public class LoginActivity extends AppCompatActivity implements VerificationList
                                 progressDialog.dismiss();
                             }
                             Log.d(TAG, "createUserWithEmail:success");
+                            int isReferral = 0;
+                            if (!referralCodeKey.equals("")) {
+                                isReferral = 1;
+                                mDatabase.child(getString(R.string.referral_code_master)).child(referralCodeKey).child(getString(R.string.isActive)).setValue(0);
+                            }
                             FirebaseUser user = mAuth.getCurrentUser();
                             writeNewUser(user.getUid(), user.getDisplayName() + "",
-                                    user.getEmail(), edtMobileRegistration.getText().toString().trim(),
-                                    "", "", 50); //DUMMY COMPANY DATA.
+                                    user.getEmail(),
+                                    "", "", 50, isReferral); //DUMMY COMPANY DATA.
                             Toast.makeText(LoginActivity.this, "Registration success.",
                                     Toast.LENGTH_LONG).show();
                             startEmployerSelectionActivity();
@@ -389,38 +426,14 @@ public class LoginActivity extends AppCompatActivity implements VerificationList
                 });
     }
 
-    private void writeNewUser(String userID, String user_name, String user_email, String user_mobile, String company_name, String company_sector, long company_score) {
-        User user = new User(userID, user_name, user_email, user_mobile, company_name, company_sector, company_score);
+    private void writeNewUser(String userID, String user_name, String user_email, String company_name, String company_sector, long company_score, int isReferral) {
+        User user = new User(userID, user_name, user_email, company_name, company_sector, company_score, isReferral);
         mDatabase.child(getString(R.string.users)).child(userID).setValue(user);
     }
 
     private void startEmployerSelectionActivity() {
         Intent intent = new Intent(LoginActivity.this, EmployerSelectionActivity.class);
         startActivity(intent);
-    }
-
-    @Override
-    public void onInitiated(String response) {
-        Log.d(TAG, "Initialized!" + response);
-        //OTP successfully resent/sent.
-    }
-
-    @Override
-    public void onInitiationFailed(Exception exception) {
-        Log.e(TAG, "Verification initialization failed: " + exception.getMessage());
-        //sending otp failed.
-    }
-
-    @Override
-    public void onVerified(String response) {
-        Log.d(TAG, "Verified!\n" + response);
-        //OTP verified successfully.
-    }
-
-    @Override
-    public void onVerificationFailed(Exception exception) {
-        Log.e(TAG, "Verification failed: " + exception.getMessage());
-        //OTP  verification failed.
     }
 }
 

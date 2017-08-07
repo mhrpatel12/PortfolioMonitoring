@@ -22,22 +22,19 @@
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
-    <string name="neera">NIRA is a new fintech business seeking to address the issue of access to credit for consumers
-in India. With banks relying predominantly on CIBIL scores and collateral pledged against
-loans, less than 10% of Indians are able to get loans through the formal sector. Thus, most
-people are forced to use informal channels when they need finance.
+    <string name="aboutUs">
+        Ten years ago\, Constant Content was a pioneer in the space of the creation and sale of prewritten content on the web.
         \n \n
-In todays digital age, users are creating large amounts of information about themselves
-through their activity on their smartphones and online. By combining these news types of
-data with traditional sources used to assess borrowers (bank statement etc.) we can now
-score these previously unscored borrowers. If a borrowers score is sufficiently high on our
-proprietary model, we can offer them credit.
+        Since then we have grown from a small start-up to one of the Internets largest and most established marketplaces for authority\, original\, SEO friendly content.
         \n \n
-We are reimagining the way loans are underwritten and bring access to credit to millions of
-underbanked in India. We can economically empower them to have greater control of their
-lives and provide downside protection in difficult times. We are addressing head-on a big
-challenge. Its also a great opportunity from both a commercial and societal impact
-perspective.</string>
+        Over the years we have evolved with market trends and business needs\, and while we continue to offer thousands of original prewritten articles through our catalog, our primary focus is on the creation of custom content based on client specific requests and needs.
+        \n \n
+        Today as part of the RevenueWire EcoSystem\, we connect businesses and agencies to the best and most diverse selection of rigorously vetted writers online\, and facilitate the building of unique teams of writers to serve specific content needs. With a roster of over 100\,000 professional writers and more than 50\,000 businesses world-wide who trust us with their content needs\, we offer the most comprehensive high-quality article and custom content writing service on the Internet today.
+        \n \n
+        Constant Contents service includes a no-risk custom content writing service as well as the Web\'s largest catalog of unique articles for sale.
+        \n \n
+        Whether you need blog posts\, article writing\, copywriting\, copyediting\, SEO writing\, press releases\, white papers\, technical writing\, or any other written content\, we\’re experts in the space of delivering unique\, quality content.
+    </string>
     <string name="prompt_email_mobile">Sign in with OTP</string>
     <string name="select_employer">Choose employer</string>
     <string name="company_master">company_master</string>
@@ -55,4 +52,18 @@ perspective.</string>
     <string name="company_score_txt">Company score</string>
     <string name="title_registering_user">Registering user.</string>
     <string name="title_signing_in_user">Logging in</string>
+    <string name="prompt_referral_code">Referral code (Optional)</string>
+    <string name="referral_code_master">referral_code_master</string>
+    <string name="referral_code">referral_code</string>
+    <string name="error_referral_code_expired">Referral code expired.</string>
+    <string name="isActive">isActive</string>
+    <string name="error_passwords_not_matching">Passwords does not match !</string>
+    <string name="error_registration">All fields are mandatory</string>
+    <string name="error_invalid_mobile">Invalid mobile number</string>
+    <string name="text_new_employer">Employer not in list?</string>
+    <string name="text_new_employer_btn">Add new</string>
+    <string name="prompt_employer">Name of employer</string>
+    <string name="add">ADD</string>
+    <string name="add_new_employer">Add new employer</string>
+    <string name="error_employer_name">Please enter employer name</string>
 </resources>

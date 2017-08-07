@@ -122,21 +122,6 @@
                     android:layout_height="wrap_content">
 
                     <EditText
-                        android:id="@+id/edtMobileRegistration"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/prompt_mobile"
-                        android:inputType="number"
-                        android:maxLength="10"
-                        android:maxLines="1" />
-
-                </android.support.design.widget.TextInputLayout>
-
-                <android.support.design.widget.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <EditText
                         android:id="@+id/edtPasswordRegistration"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -165,6 +150,24 @@
                         android:inputType="textPassword"
                         android:maxLines="1"
                         android:text="password" />
+
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/edtReferalCodeRegistration"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/prompt_referral_code"
+                        android:imeActionId="@+id/login"
+                        android:imeActionLabel="@string/action_sign_in_short"
+                        android:imeOptions="actionUnspecified"
+                        android:inputType="textPassword"
+                        android:maxLines="1"
+                        android:text="aaa111" />
 
                 </android.support.design.widget.TextInputLayout>
 
