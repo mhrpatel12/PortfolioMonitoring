@@ -5,7 +5,10 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,6 +59,11 @@ public class EmployerSelectionFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_employer_selection, container, false);
         mContext = view.getContext();
 
+        Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        ((TextView) toolbar.findViewById(R.id.txtTitle)).setText(getString(R.string.title_activity_employer_selection));
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+
         args = new Bundle();
         mPortfolioManagerReference = FirebaseDatabase.getInstance().getReference();
 
@@ -63,6 +71,10 @@ public class EmployerSelectionFragment extends Fragment {
         txtNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (spinnerCompanyName.getSelectedItem().equals(getString(R.string.prompt_company))) {
+                    Toast.makeText(mContext, getString(R.string.error_select_employer), Toast.LENGTH_LONG).show();
+                    return;
+                }
                 if (isEmployerPreSelected) {
                     startCompanyDetailsFragment();
                     return;
@@ -191,6 +203,14 @@ public class EmployerSelectionFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            getFragmentManager().popBackStack();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     public void startCompanyDetailsFragment() {
         CompanyDetailsFragment companyDetailsFragment = new CompanyDetailsFragment();
         FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
@@ -230,7 +250,7 @@ public class EmployerSelectionFragment extends Fragment {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 User user = dataSnapshot.getValue(User.class);
-                if (user.getCompany_name() != null) {
+                if (user != null && user.getCompany_name() != null) {
                     spinnerCompanyName.setSelection(adapterCompanyNames.getPosition(user.getCompany_name()) + 1);
                     isEmployerPreSelected = true;
                 }

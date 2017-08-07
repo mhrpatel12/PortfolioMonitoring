@@ -17,15 +17,15 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.4"
+            android:layout_weight="0.35"
             android:text="@string/company_name_txt"
-            android:textStyle="bold" />
+            android:textColor="@android:color/black" />
 
         <TextView
             android:id="@+id/txtCompanyName"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.6"
+            android:layout_weight="0.65"
             android:text="@string/company_name" />
 
     </LinearLayout>
@@ -40,15 +40,15 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.4"
+            android:layout_weight="0.35"
             android:text="@string/company_sector_txt"
-            android:textStyle="bold" />
+            android:textColor="@android:color/black" />
 
         <TextView
             android:id="@+id/txtCompanySector"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.6"
+            android:layout_weight="0.65"
             android:text="@string/company_name" />
 
     </LinearLayout>
@@ -63,15 +63,15 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.4"
+            android:layout_weight="0.35"
             android:text="@string/company_score_txt"
-            android:textStyle="bold" />
+            android:textColor="@android:color/black" />
 
         <TextView
             android:id="@+id/txtCompanyScore"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.6"
+            android:layout_weight="0.65"
             android:text="@string/company_name" />
 
     </LinearLayout>

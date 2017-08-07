@@ -3,8 +3,12 @@ package com.mihir.portfoliomonitoring.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -27,6 +31,11 @@ public class CompanyDetailsFragment extends Fragment {
         // Required empty public constructor
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -34,6 +43,11 @@ public class CompanyDetailsFragment extends Fragment {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_company_details, container, false);
         mContext = view.getContext();
+
+        Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        ((TextView) toolbar.findViewById(R.id.txtTitle)).setText(getString(R.string.title_fragment_cpmpany_details));
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         txtCompanyName = (TextView) view.findViewById(R.id.txtCompanyName);
         txtCompanySector = (TextView) view.findViewById(R.id.txtCompanySector);
@@ -54,6 +68,14 @@ public class CompanyDetailsFragment extends Fragment {
         }
 
         return view;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            getFragmentManager().popBackStack();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
 }

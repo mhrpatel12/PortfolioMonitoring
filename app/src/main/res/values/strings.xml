@@ -4,7 +4,7 @@
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
     <string name="prompt_mobile">Mobile</string>
-    <string name="prompt_password">Password (optional)</string>
+    <string name="prompt_password">Password</string>
     <string name="action_sign_in">Sign in</string>
     <string name="action_register">Register</string>
     <string name="action_sign_in_short">Sign in</string>
@@ -47,7 +47,7 @@
     <string name="company_sector_txt">Company sector</string>
     <string name="company_score">company_score</string>
     <string name="otp_key">168742A1WdzmbPWHo59878e64</string>
-    <string name="error_threshold">Too many users in your employer sector, cannot proceed further.</string>
+    <string name="error_threshold">Too many users in sector of your employer, cannot proceed further.</string>
     <string name="company_name_txt">Company name</string>
     <string name="company_score_txt">Company score</string>
     <string name="title_registering_user">Registering user.</string>
@@ -66,4 +66,9 @@
     <string name="add">ADD</string>
     <string name="add_new_employer">Add new employer</string>
     <string name="error_employer_name">Please enter employer name</string>
+    <string name="prompt_confirm_password">Confirm password</string>
+    <string name="error_select_employer">Please select employer first</string>
+    <string name="title_fragment_about_us">About Us</string>
+    <string name="title_fragment_cpmpany_details">Employer Details</string>
+    <string name="error_referral_code_invalid">Invalid referral code</string>
 </resources>

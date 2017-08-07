@@ -7,8 +7,8 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/about_us"
-        android:scaleType="matrix" />
+        android:src="@drawable/about_us"
+        android:scaleType="centerCrop"/>
 
 
     <View
@@ -19,12 +19,12 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:layout_margin="30dp">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="30dp"
             android:text="@string/aboutUs"
             android:textColor="@android:color/white" />
     </ScrollView>

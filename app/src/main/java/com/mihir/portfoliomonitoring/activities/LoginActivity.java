@@ -96,6 +96,8 @@ public class LoginActivity extends AppCompatActivity {
             finish();
         }
 
+        mayRequestPermission();
+
         progressDialog = new ProgressDialog(this);
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
@@ -263,18 +265,26 @@ public class LoginActivity extends AppCompatActivity {
         mDatabase.child(getString(R.string.referral_code_master)).orderByChild(getString(R.string.referral_code)).equalTo(referralCode).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                    ReferralCodeMaster referralCodeMaster = ds.getValue(ReferralCodeMaster.class);
-                    if (referralCodeMaster.getIsActive() == 1) {
-                        referralCodeKey = ds.getKey();
-                        attemptRegistrationByEmailPassword(edtEmailRegistration.getText().toString().trim(), edtPasswordRegistration.getText().toString().trim());
-                    } else {
-                        if (progressDialog.isShowing()) {
-                            progressDialog.dismiss();
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                        ReferralCodeMaster referralCodeMaster = ds.getValue(ReferralCodeMaster.class);
+                        if (referralCodeMaster.getIsActive() == 1) {
+                            referralCodeKey = ds.getKey();
+                            attemptRegistrationByEmailPassword(edtEmailRegistration.getText().toString().trim(), edtPasswordRegistration.getText().toString().trim());
+                        } else {
+                            if (progressDialog.isShowing()) {
+                                progressDialog.dismiss();
+                            }
+                            Toast.makeText(LoginActivity.this, getString(R.string.error_referral_code_expired),
+                                    Toast.LENGTH_LONG).show();
                         }
-                        Toast.makeText(LoginActivity.this, getString(R.string.error_referral_code_expired),
-                                Toast.LENGTH_LONG).show();
                     }
+                } else {
+                    if (progressDialog.isShowing()) {
+                        progressDialog.dismiss();
+                    }
+                    Toast.makeText(LoginActivity.this, getString(R.string.error_referral_code_invalid),
+                            Toast.LENGTH_LONG).show();
                 }
             }
 
