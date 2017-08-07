@@ -8,22 +8,23 @@ public class User {
     private String userID;
     private String user_name;
     private String user_email;
-    private String user_mobile;
     private String company_name;
     private String company_sector;
     private long company_score;
+    private int isReferral;
 
-    public User(){
+    public User() {
 
     }
-    public User(String userID, String user_name, String user_email, String user_mobile, String company_name, String company_sector, long company_score) {
+
+    public User(String userID, String user_name, String user_email, String company_name, String company_sector, long company_score, int isReferral) {
         this.userID = userID;
         this.user_name = user_name;
         this.user_email = user_email;
-        this.user_mobile = user_mobile;
         this.company_name = company_name;
         this.company_sector = company_sector;
         this.company_score = company_score;
+        this.isReferral = isReferral;
     }
 
     public String getUser_name() {
@@ -40,14 +41,6 @@ public class User {
 
     public void setUser_email(String user_email) {
         this.user_email = user_email;
-    }
-
-    public String getUser_mobile() {
-        return user_mobile;
-    }
-
-    public void setUser_mobile(String user_mobile) {
-        this.user_mobile = user_mobile;
     }
 
     public String getUserID() {

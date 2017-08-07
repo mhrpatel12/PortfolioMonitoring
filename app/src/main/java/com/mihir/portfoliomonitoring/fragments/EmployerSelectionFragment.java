@@ -1,5 +1,6 @@
 package com.mihir.portfoliomonitoring.fragments;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,7 +39,9 @@ public class EmployerSelectionFragment extends Fragment {
     private ArrayAdapter<String> adapterCompanyNames;
     private MaterialSpinner spinnerCompanyName;
     private TextView txtNext;
+    private TextView txtAddNewEmployer;
     private long totalUsers = 0;
+    private long totalCompanies = 0;
     private boolean isThresholdCrossed = false;
     private boolean isSpinnerClicked = false;
     private boolean isEmployerPreSelected = false;
@@ -77,6 +81,38 @@ public class EmployerSelectionFragment extends Fragment {
                 }
             }
         });
+        txtAddNewEmployer = (TextView) view.findViewById(R.id.btnAddNewEmployer);
+        txtAddNewEmployer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Dialog dialog = new Dialog(mContext);
+                dialog.setContentView(R.layout.dialog_new_employer);
+                dialog.setTitle(getString(R.string.add_new_employer));
+                dialog.getWindow().getAttributes().width = ViewGroup.LayoutParams.MATCH_PARENT;
+
+                TextView btnAddEmployer = (TextView) dialog.findViewById(R.id.btnAddEmployer);
+                final EditText edtEmployerName = (EditText) dialog.findViewById(R.id.edtEmployerName);
+
+                // if button is clicked, close the custom dialog
+                btnAddEmployer.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (!edtEmployerName.getText().toString().trim().equals("")) {
+                            CompanyMaster companyMaster = new CompanyMaster();
+                            companyMaster.setCompany_name(edtEmployerName.getText().toString().trim());
+                            companyMaster.setCompany_sector("");
+                            companyMaster.setCompany_score(0);
+                            companyMaster.setIsActive(0);
+                            mPortfolioManagerReference.child(getString(R.string.company_master)).child(totalCompanies + "").setValue(companyMaster);
+                            dialog.dismiss();
+                        } else {
+                            Toast.makeText(mContext, getString(R.string.error_employer_name), Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+                dialog.show();
+            }
+        });
         spinnerCompanyName = (MaterialSpinner) view.findViewById(R.id.spinnerCompanyName);
         adapterCompanyNames = new ArrayAdapter<String>(mContext, android.R.layout.simple_spinner_item, companyNameArrayList);
         spinnerCompanyName.setAdapter(adapterCompanyNames);
@@ -86,6 +122,20 @@ public class EmployerSelectionFragment extends Fragment {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     totalUsers = dataSnapshot.getChildrenCount();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        mPortfolioManagerReference.child(getString(R.string.company_master)).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    totalCompanies = dataSnapshot.getChildrenCount();
                 }
             }
 
@@ -158,7 +208,7 @@ public class EmployerSelectionFragment extends Fragment {
         super.onResume();
         isSpinnerClicked = false;
 
-        mPortfolioManagerReference.child(getString(R.string.company_master)).addValueEventListener(new ValueEventListener() {
+        mPortfolioManagerReference.child(getString(R.string.company_master)).orderByChild(getString(R.string.isActive)).equalTo(1).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 companyNameArrayList.clear();

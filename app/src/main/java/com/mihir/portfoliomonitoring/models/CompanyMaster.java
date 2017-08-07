@@ -8,6 +8,15 @@ public class CompanyMaster {
     private String company_name;
     private String company_sector;
     private long company_score;
+    private int isActive;
+
+    public int getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(int isActive) {
+        this.isActive = isActive;
+    }
 
     public String getCompany_name() {
         return company_name;
